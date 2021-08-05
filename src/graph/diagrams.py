@@ -51,9 +51,31 @@ def old(x, tpm, sd_tpm):
 
 # plotting a dataframe, making "subplots" according to experiment name
 # commented out a try to add lines in the scatter plot, does not work when using subplots
-def plot(df):
-    fig2 = px.scatter(df, x="EXP", y="TPM", color="AGI", error_x="sd_TPM", error_y="sd_TPM", facet_col="exp_name")
+def plot(df, name):
+    fig2 = px.scatter(df, x="EXP", y="TPM", color="AGI", error_x="sd_TPM", error_y="sd_TPM", facet_col="exp_name",
+                      title=name)
     fig2.update_xaxes(matches=None)
     # fig1 = px.line(df, x="EXP", y="TPM", color="AGI", facet_col="exp_name")
     # fig = go.Figure(data=fig1.data + fig2.data)
-    fig2.show()
+    return fig2
+
+
+# plotting the heatmap
+# again not correct yet because of the use of strands and samples
+def heatmap(csv, strands, samples):
+    data = []
+    for sample in samples:
+        new = []
+        for strand in strands:
+            filtered = csv[csv["sample"].str.contains(sample)]
+            filtered = filtered[filtered.strand.str.contains(strand)]
+            if filtered[filtered.AGI.str.contains("AT1G01080")].empty:
+                new.append(0)
+            else:
+                new.append(1)
+        data.append(new)
+
+    fig = px.imshow(data,
+                    x=strands,
+                    y=samples)
+    return fig
