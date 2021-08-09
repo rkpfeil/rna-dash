@@ -17,26 +17,17 @@ def get_name(exp):
 
 # processing csvs containing tpms, merging of the tables unnecessary for now
 # as the one for the transcripts contains all necessary information
-def proc(gene, trans):
-    # renaming the isoform column to AGI to be able to merge the tables
-    trans.rename(columns={"isoform": "AGI"}, inplace=True)
-    dfs = [gene, trans]
-    allgenes = pd.concat(dfs)
-    allgenes = trans
-
-    # adding a new column with the experiment for the subplots
-    allgenes["exp_name"] = allgenes.EXP.apply(get_name)
-
-    # making the plot for gene AT1G01020
-    fig = diagrams.plot(allgenes[allgenes.AGI.str.contains("AT1G01060")], "AT1G01060")
+def proc(allgenes, name, percent):
+    # making the plot for gene
+    fig = diagrams.plot(allgenes[allgenes.AGI.str.contains(name)], name)
     return fig
 
 
 # processing the csv containing occurrences of genes in other datasets
 # not entirely correct yet, strands and samples not always applicable
-def occ(csv):
+def occ(csv, gene):
     strands = csv.strand.tolist()
     strands = np.unique(strands)
     samples = csv["sample"].tolist()
     samples = np.unique(samples)
-    return diagrams.heatmap(csv, strands, samples)
+    return diagrams.heatmap(csv, strands, samples, gene)

@@ -62,14 +62,14 @@ def plot(df, name):
 
 # plotting the heatmap
 # again not correct yet because of the use of strands and samples
-def heatmap(csv, strands, samples):
+def heatmap(csv, strands, samples, gene):
     data = []
     for sample in samples:
         new = []
         for strand in strands:
             filtered = csv[csv["sample"].str.contains(sample)]
             filtered = filtered[filtered.strand.str.contains(strand)]
-            if filtered[filtered.AGI.str.contains("AT1G01080")].empty:
+            if filtered[filtered.AGI.str.contains(gene)].empty:
                 new.append(0)
             else:
                 new.append(1)

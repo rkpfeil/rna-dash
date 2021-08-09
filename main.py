@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from dash.dependencies import Input, Output
 import pandas as pd
 import dash
 import dash_core_components as dcc
@@ -27,10 +28,16 @@ occ_csv = pd.read_csv(args.occ, sep="\t")
 # getting a list of all genes by only using rows containing a single timestamp
 genes = gene_csv[gene_csv.EXP.str.contains("7ko_LL18")].AGI
 
-# both of the figures, will be unnecessary once app.callback is implemented
-fig = processing.proc(gene_csv, trans_csv)
+# renaming the isoform column to AGI to be able to merge the tables
+trans_csv.rename(columns={"isoform": "AGI"}, inplace=True)
 
-heatmap = processing.occ(occ_csv)
+# adding a new column with the experiment for the subplots
+trans_csv["exp_name"] = trans_csv.EXP.apply(processing.get_name)
+
+# both of the figures, will be unnecessary once app.callback is implemented
+# fig = processing.proc(gene_csv, trans_csv)
+
+# heatmap = processing.occ(occ_csv)
 
 # two parts of the dash, cleaning up the layout
 dropdown = dbc.Card(
@@ -46,9 +53,11 @@ dropdown = dbc.Card(
 
 fil = dbc.Card(
     [
-        dcc.Input(
+        dcc.Dropdown(
             id='filter',
-            placeholder='Filter the output'
+            options=[{"label": "10%", "value": 0.1}, {"label": "20%", "value": 0.2}, {"label": "5%", "value": 0.05},
+                     {"label": "all", "value": 0}],
+            value=0
         )
     ]
 )
@@ -75,28 +84,52 @@ app.layout = dbc.Container(
 
         dbc.Row(
             [dcc.Graph(
-                id='exp-graph',
-                figure=fig)]
+                id='exp-graph')]
         ),
 
         dbc.Row(
             [
                 dbc.Col(
                     dbc.Toast(
-                        [html.P(desc_csv[desc_csv.gene.str.contains("AT1G01060")].description)],
-                        header=desc_csv[desc_csv.gene.str.contains("AT1G01060")].name
+                        [html.P(id='desc')],
+                        id='name'
                     ), md=2
                 ),
                 dbc.Col(
                     dcc.Graph(
-                        id="heatmap",
-                        figure=heatmap
+                        id="heatmap"
                     ), md=8
                 )
             ]
         )
     ]
 )
+
+
+@app.callback(
+    Output('exp-graph', 'figure'),
+    Input('gene', 'value'),
+    Input('filter', 'value'))
+def exp_graph(gene, percent):
+    return processing.proc(trans_csv, gene, percent)
+
+
+@app.callback(
+    Output('name', 'header'),
+    Output('desc', 'children'),
+    Input('gene', 'value'))
+def description(gene):
+    name = desc_csv[desc_csv.gene.str.contains(gene)].name
+    desc = desc_csv[desc_csv.gene.str.contains(gene)].description
+    return name, desc
+
+
+@app.callback(
+    Output('heatmap', 'figure'),
+    Input('gene', 'value'))
+def heatmap(gene):
+    return processing.occ(occ_csv, gene)
+
 
 # main()
 app.run_server(debug=True)
