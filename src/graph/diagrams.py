@@ -1,6 +1,7 @@
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
+import pandas as pd
 
 
 # first function try, kept for remembering subplots
@@ -63,22 +64,39 @@ def plot(df, name):
 
 
 # plotting the heatmap
-# again not correct yet because of the use of strands and samples
-def heatmap(csv, strands, samples, gene):
+# used if there is two values in sample
+# keeping the variable names strands and samples
+def heatmap(csv, samples, strands, gene):
     data = []
     for sample in samples:
         new = []
         for strand in strands:
             filtered = csv[csv["sample"].str.contains(sample)]
-            filtered = filtered[filtered.strand.str.contains(strand)]
+            filtered = filtered[filtered["sample"].str.contains(strand)]
             if filtered[filtered.AGI.str.contains(gene)].empty:
                 new.append(0)
             else:
                 new.append(1)
+            print(new)
         data.append(new)
 
     fig = px.imshow(data,
                     x=strands,
                     y=samples,
                     color_continuous_scale=["red", "green"])
+    return fig
+
+
+# not in fact a heatmap because that only works if I have two things
+def heatmap2(csv, samples, gene):
+    data = []
+    for sample in samples:
+        filtered = csv[csv["sample"].str.contains(sample)]
+        if filtered[filtered.AGI.str.contains(gene)].empty:
+            data.append(0)
+        else:
+            data.append(1)
+    dic = {"sample": samples, "data": data}
+    df = pd.DataFrame(dic)
+    fig = px.bar(df, x="sample", y=data)
     return fig

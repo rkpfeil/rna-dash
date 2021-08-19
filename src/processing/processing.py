@@ -48,9 +48,8 @@ def proc(allgenes, name, percent):
 
 # processing the csv containing occurrences of genes in other datasets
 # not entirely correct yet, strands and samples not always applicable
-def occ(csv, gene):
-    strands = csv.strand.tolist()
-    strands = np.unique(strands)
-    samples = csv["sample"].tolist()
-    samples = np.unique(samples)
-    return diagrams.heatmap(csv, strands, samples, gene)
+def occ(csv, val1, val2, gene):
+    if len(val2) > 1:
+        return diagrams.heatmap(csv, val1, val2, gene)
+    else:
+        return diagrams.heatmap2(csv, val1, gene)
