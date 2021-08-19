@@ -19,8 +19,12 @@ arg.add_argument("-g", "--gene", dest="gene", nargs="?", required=True)
 arg.add_argument("-t", "--transcript", dest="trans", nargs="?", required=True)
 arg.add_argument("-d", "--description", dest="desc", nargs="?", required=True)
 arg.add_argument("-o", "--occurrence", dest="occ", nargs="?", required=True)
+arg.add_argument("-p", "--port", dest="port", required=False, default=8050)
+arg.add_argument("-b", "--debug", dest="debug", default=False)
 args = arg.parse_args()
 
+port = args.port
+debug = args.debug
 gene_csv = pd.read_csv(args.gene, sep="\t")
 trans_csv = pd.read_csv(args.trans, sep="\t")
 desc_csv = pd.read_csv(args.desc, sep="\t", header=None, names=['gene', 'name', 'description'])
@@ -52,8 +56,6 @@ else:
     occ_csv["val1"] = occ_csv.sample.apply(lambda x: x[0])
     val1 = occ_csv.val1.tolist()
     val1 = np.unique(val1)
-
-print(len(val2))
 
 # two parts of the dash, cleaning up the layout
 dropdown = dbc.Card(
@@ -148,4 +150,4 @@ def heatmap(gene):
 
 
 # main()
-app.run_server(debug=False, host="0.0.0.0")
+app.run_server(debug=debug, host="0.0.0.0", port=port)
