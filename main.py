@@ -54,7 +54,7 @@ dropdown = dbc.Card(
 fil = dbc.Card(
     [
         dcc.Dropdown(
-            id='filter',
+            id='percent',
             options=[{"label": "10%", "value": 0.1}, {"label": "20%", "value": 0.2}, {"label": "5%", "value": 0.05},
                      {"label": "all", "value": 0}],
             value=0
@@ -105,11 +105,11 @@ app.layout = dbc.Container(
     ]
 )
 
-
+# updating every part according to the dropdowns
 @app.callback(
     Output('exp-graph', 'figure'),
     Input('gene', 'value'),
-    Input('filter', 'value'))
+    Input('percent', 'value'))
 def exp_graph(gene, percent):
     return processing.proc(trans_csv, gene, percent)
 
@@ -132,4 +132,4 @@ def heatmap(gene):
 
 
 # main()
-app.run_server(debug=True)
+app.run_server(debug=False, host="0.0.0.0")

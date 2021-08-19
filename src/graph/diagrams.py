@@ -53,7 +53,9 @@ def old(x, tpm, sd_tpm):
 # commented out a try to add lines in the scatter plot, does not work when using subplots
 def plot(df, name):
     fig2 = px.scatter(df, x="EXP", y="TPM", color="AGI", error_x="sd_TPM", error_y="sd_TPM", facet_col="exp_name",
-                      title=name)
+                      title=name,
+                      category_orders={"exp_name": ["wt", "7ko", "7ox", "8ox"]},
+                      template="plotly_white")
     fig2.update_xaxes(matches=None)
     # fig1 = px.line(df, x="EXP", y="TPM", color="AGI", facet_col="exp_name")
     # fig = go.Figure(data=fig1.data + fig2.data)
@@ -77,5 +79,6 @@ def heatmap(csv, strands, samples, gene):
 
     fig = px.imshow(data,
                     x=strands,
-                    y=samples)
+                    y=samples,
+                    color_continuous_scale=["red", "green"])
     return fig
