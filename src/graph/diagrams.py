@@ -53,11 +53,15 @@ def old(x, tpm, sd_tpm):
 # plotting a dataframe, making "subplots" according to experiment name
 # commented out a try to add lines in the scatter plot, does not work when using subplots
 def plot(df, name):
-    fig2 = px.scatter(df, x="EXP", y="TPM", color="AGI", error_x="sd_TPM", error_y="sd_TPM", facet_col="exp_name",
-                      title=name,
-                      category_orders={"exp_name": ["wt", "7ko", "7ox", "8ox"]},
-                      template="plotly_white")
+    fig2 = px.line(df, x="EXP", y="TPM", color="AGI", error_x="sd_TPM", error_y="sd_TPM", facet_col="exp_name",
+                   title=name,
+                   labels=dict(EXP=""),
+                   category_orders={"exp_name": ["wt", "7ko", "7ox", "8ox"]},
+                   template="plotly_white")
     fig2.update_xaxes(matches=None)
+    fig2.update_xaxes(tickangle=45)
+    fig2.update_yaxes(rangemode="tozero")
+    fig2.update_traces(mode='markers+lines')
     # fig1 = px.line(df, x="EXP", y="TPM", color="AGI", facet_col="exp_name")
     # fig = go.Figure(data=fig1.data + fig2.data)
     return fig2
@@ -77,13 +81,14 @@ def heatmap(csv, samples, strands, gene):
                 new.append(0)
             else:
                 new.append(1)
-            print(new)
         data.append(new)
 
     fig = px.imshow(data,
                     x=strands,
                     y=samples,
-                    color_continuous_scale=["red", "green"])
+                    color_continuous_scale=["red", "green"],
+                    width=600,
+                    height=300)
     return fig
 
 

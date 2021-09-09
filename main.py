@@ -8,7 +8,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import src.processing.processing as processing
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = [dbc.themes.BOOTSTRAP]
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -21,10 +21,12 @@ arg.add_argument("-d", "--description", dest="desc", nargs="?", required=True)
 arg.add_argument("-o", "--occurrence", dest="occ", nargs="?", required=True)
 arg.add_argument("-p", "--port", dest="port", required=False, default=8050)
 arg.add_argument("-b", "--debug", dest="debug", default=False)
+arg.add_argument("-i", "--title", dest="title", default="")
 args = arg.parse_args()
 
 port = args.port
 debug = args.debug
+title = args.title
 gene_csv = pd.read_csv(args.gene, sep="\t")
 trans_csv = pd.read_csv(args.trans, sep="\t")
 desc_csv = pd.read_csv(args.desc, sep="\t", header=None, names=['gene', 'name', 'description'])
@@ -38,7 +40,6 @@ trans_csv.rename(columns={"isoform": "AGI"}, inplace=True)
 
 # adding a new column with the experiment for the subplots
 trans_csv["exp_name"] = trans_csv["EXP"].apply(processing.get_name)
-
 
 # extracting data about other experiments
 # if there is two conditions splitting the sample part
@@ -58,52 +59,68 @@ else:
     val1 = np.unique(val1)
 
 # two parts of the dash, cleaning up the layout
-dropdown = dbc.Card(
+dropdown = html.Div(
     [
+        html.Label(
+            [
+                "Genes",
+
+            ]
+        ),
         dcc.Dropdown(
-                    id='gene',
-                    options=[{"label": gene, "value": gene} for gene in genes.tolist()
-                             ],
-                    value="AT1G01060"
+                id="gene",
+                options=[{"label": gene, "value": gene} for gene in genes.tolist()
+                         ],
+                value="AT1G01060"
+                ),
+        dbc.Tooltip(
+            "Choose a gene to show information about",
+            target="dropdown_gene"
         )
     ]
 )
 
-fil = dbc.Card(
+fil = html.Div(
     [
+        html.Label(
+            [
+                "Filter",
+
+            ]
+        ),
         dcc.Dropdown(
             id='percent',
-            options=[{"label": "10%", "value": 0.1}, {"label": "20%", "value": 0.2}, {"label": "5%", "value": 0.05},
-                     {"label": "all", "value": 0}],
+            options=[{"label": "10%", "value": 0.1}, {"label": "20%", "value": 0.2},
+                     {"label": "5%", "value": 0.05}, {"label": "No Filter", "value": 0}],
             value=0
+        ),
+        dbc.Tooltip(
+            "Choose which transcripts to show. Transcripts with an expression of lower than ... of the total expression are not shown",
+            target="filter"
         )
     ]
 )
+
+# '''
+#             Expression profiles of Col2 (WT), grp7-1 8i, AtGRP7-ox and AtGRP8-ox RNA-seq samples
+#         '''
 
 # app layout deciding how the dashboard looks
 app.layout = dbc.Container(
     [
         html.H1(children='RNA-seq transcript expression Dashboard'),
 
-        html.Div(children='''
-            Expression profiles of Col2 (WT), grp7-1 8i, AtGRP7-ox and AtGRP8-ox RNA-seq samples
-        '''),
-
-        dropdown,
-
-        fil,
-
-        #dbc.Row(
-        #    [
-        #        dbc.Col(dropdown, md=8),
-        #        dbc.Col(fil, md=4)
-        #    ]
-        #),
+        html.Div(children=title),
 
         dbc.Row(
-            [dcc.Graph(
-                id='exp-graph')]
+            [
+                dbc.Col(dropdown, id="dropdown_gene"),
+                dbc.Col(fil, id="filter")
+            ]
         ),
+
+        dcc.Graph(
+                id='exp-graph'),
 
         dbc.Row(
             [
@@ -111,17 +128,18 @@ app.layout = dbc.Container(
                     dbc.Toast(
                         [html.P(id='desc')],
                         id='name'
-                    ), md=2
+                    )
                 ),
                 dbc.Col(
                     dcc.Graph(
                         id="heatmap"
-                    ), md=8
+                    )
                 )
             ]
         )
     ]
 )
+
 
 # updating every part according to the dropdowns
 @app.callback(
