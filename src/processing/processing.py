@@ -4,7 +4,7 @@ import numpy as np
 
 
 # function to get the experiment name out of the data
-def get_name(exp):
+def get_name_old(exp):
     if "7ko" in exp:
         return "7ko"
     elif "7ox" in exp:
@@ -13,6 +13,10 @@ def get_name(exp):
         return "8ox"
     else:
         return "wt"
+
+
+def get_name(exp):
+    return exp.split("_")[0]
 
 
 # processing csvs containing tpms, merging of the tables unnecessary for now

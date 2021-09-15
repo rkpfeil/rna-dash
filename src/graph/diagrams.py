@@ -56,7 +56,7 @@ def plot(df, name):
     fig2 = px.line(df, x="EXP", y="TPM", color="AGI", error_x="sd_TPM", error_y="sd_TPM", facet_col="exp_name",
                    title=name,
                    labels=dict(EXP=""),
-                   category_orders={"exp_name": ["wt", "7ko", "7ox", "8ox"]},
+                   category_orders={"exp_name": ["wt"]},
                    template="plotly_white")
     fig2.update_xaxes(matches=None)
     fig2.update_xaxes(tickangle=45)
@@ -86,7 +86,7 @@ def heatmap(csv, samples, strands, gene):
     fig = px.imshow(data,
                     x=strands,
                     y=samples,
-                    color_continuous_scale=["red", "green"],
+                    color_continuous_scale=["red", "white", "green"],
                     width=600,
                     height=300)
     return fig

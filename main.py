@@ -33,7 +33,9 @@ desc_csv = pd.read_csv(args.desc, sep="\t", header=None, names=['gene', 'name', 
 occ_csv = pd.read_csv(args.occ, sep="\t")
 
 # getting a list of all genes by only using rows containing a single timestamp
-genes = gene_csv[gene_csv["EXP"].str.contains("7ko_LL18")].AGI
+# genes = gene_csv[gene_csv["EXP"].str.contains("7ko_LL18")].AGI
+genes = desc_csv["gene"].astype(str) + ", " + desc_csv["name"].astype(str) + ", " + desc_csv["description"].astype(str)
+print(genes.tolist()[1:9])
 
 # renaming the isoform column to AGI to be able to merge the tables
 trans_csv.rename(columns={"isoform": "AGI"}, inplace=True)
@@ -71,7 +73,7 @@ dropdown = html.Div(
                 id="gene",
                 options=[{"label": gene, "value": gene} for gene in genes.tolist()
                          ],
-                value="AT1G01060"
+                value=genes.tolist()[0]
                 ),
         dbc.Tooltip(
             "Choose a gene to show information about",
@@ -147,6 +149,7 @@ app.layout = dbc.Container(
     Input('gene', 'value'),
     Input('percent', 'value'))
 def exp_graph(gene, percent):
+    gene = gene[0:9]
     return processing.proc(trans_csv, gene, percent)
 
 
@@ -155,6 +158,7 @@ def exp_graph(gene, percent):
     Output('desc', 'children'),
     Input('gene', 'value'))
 def description(gene):
+    gene = gene[0:9]
     name = desc_csv[desc_csv.gene.str.contains(gene)].name
     desc = desc_csv[desc_csv.gene.str.contains(gene)].description
     return name, desc
@@ -164,6 +168,7 @@ def description(gene):
     Output('heatmap', 'figure'),
     Input('gene', 'value'))
 def heatmap(gene):
+    gene = gene[0:9]
     return processing.occ(occ_csv, val1, val2, gene)
 
 
