@@ -15,7 +15,6 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 # def main():
 # adding all the arguments, reading the data
 arg = ArgumentParser()
-arg.add_argument("-g", "--gene", dest="gene", nargs="?", required=True)
 arg.add_argument("-t", "--transcript", dest="trans", nargs="?", required=True)
 arg.add_argument("-d", "--description", dest="desc", nargs="?", required=True)
 arg.add_argument("-o", "--occurrence", dest="occ", nargs="?", required=True)
@@ -27,13 +26,11 @@ args = arg.parse_args()
 port = args.port
 debug = args.debug
 title = args.title
-gene_csv = pd.read_csv(args.gene, sep="\t")
 trans_csv = pd.read_csv(args.trans, sep="\t")
 desc_csv = pd.read_csv(args.desc, sep="\t", header=None, names=['gene', 'name', 'description'])
 occ_csv = pd.read_csv(args.occ, sep="\t")
 
-# getting a list of all genes by only using rows containing a single timestamp
-# genes = gene_csv[gene_csv["EXP"].str.contains("7ko_LL18")].AGI
+# getting a list of all genes and their names and descriptions
 genes = desc_csv["gene"].astype(str) + ", " + desc_csv["name"].astype(str) + ", " + desc_csv["description"].astype(str)
 print(genes.tolist()[1:9])
 
