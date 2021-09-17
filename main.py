@@ -32,7 +32,7 @@ occ_csv = pd.read_csv(args.occ, sep="\t")
 
 # getting a list of all genes and their names and descriptions
 genes = desc_csv["gene"].astype(str) + ", " + desc_csv["name"].astype(str) + ", " + desc_csv["description"].astype(str)
-print(genes.tolist()[1:9])
+genes = genes.str.slice(stop=60)
 
 # renaming the isoform column to AGI to be able to merge the tables
 trans_csv.rename(columns={"isoform": "AGI"}, inplace=True)

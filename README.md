@@ -29,7 +29,7 @@ sample can contain either one or two conditions, separated by a space
 
 #### dashboard
 
-The dashboard contains a graph showing the expression of a gene. This gene is chosen via a dropdown menu containing all available genes. If a gene has a name an/or description but there is no expression data, a blank graph is shown. The shown expression data can be filtered with a second dropdown menu. With this dropdown menu a percentage is selected. Transcripts with an expression under said percentage of the gene expression will be excluded from the graph.
+The dashboard contains a graph showing the expression of a gene. This gene is chosen via a dropdown menu containing all available genes with their name and descriptions. This is cut off after 70 characters. If a gene has a name an/or description but there is no expression data, a blank graph is shown. The shown expression data can be filtered with a second dropdown menu. With this dropdown menu a percentage is selected. Transcripts with an expression under said percentage of the gene expression will be excluded from the graph.
 
 ![Picture of the upper part of the dashboard, containing title, filter options and the graph](/pictures/dashboard_top.png)
 
